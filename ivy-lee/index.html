@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ivy Lee Method - Weekly</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body data-theme="sakura">
+    <div class="app-layout">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-titles">
+                    <h1>Ivy Lee Method</h1>
+                    <p>明日のための、最も重要な6つのタスクを1週間の視点で</p>
+                </div>
+                <div class="header-right-group">
+                    <div class="controls-row">
+                        <select id="theme-selector" class="theme-select" aria-label="テーマ選択">
+                            <option value="light">Cloud White</option>
+                            <option value="dark">Midnight Dark</option>
+                        </select>
+                        <button id="show-routines-btn" class="secondary-btn">ルーティン設定</button>
+                        <button id="show-history-btn" class="secondary-btn">完了履歴</button>
+                    </div>
+                    <div class="category-toggle">
+                        <button id="tab-work" class="tab-btn active" data-category="work">仕事</button>
+                        <button id="tab-private" class="tab-btn" data-category="private">プライベート</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Week Navigation -->
+            <div class="week-navigation" style="justify-content: center; gap: 20px;">
+                <button id="prev-week-btn" class="icon-btn border-btn" aria-label="前の週">◀ 先週</button>
+                <button id="today-btn" class="icon-btn" style="font-size: 11px; padding: 4px 12px; background: rgba(0,0,0,0.05);">今日</button>
+                <button id="next-week-btn" class="icon-btn border-btn" aria-label="次の週">来週 ▶</button>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="week-container" id="week-container">
+                <!-- JS will inject 7 day cards here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>完了履歴 <span id="history-category-label"></span></h2>
+                <button class="close-btn" data-close="history-modal" aria-label="閉じる">×</button>
+            </div>
+            <div class="modal-body">
+                <ul id="history-list" class="history-list">
+                    <!-- History entries injected here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="clear-history-btn" class="danger-btn">現在の履歴を全消去</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Routine Modal -->
+    <div id="routine-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ルーティン設定 <span id="routine-category-label"></span></h2>
+                <button class="close-btn" data-close="routine-modal" aria-label="閉じる">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="routine-input-group">
+                    <input type="text" id="routine-text-input" placeholder="繰り返したいタスク名を入力...">
+                    <div class="routine-rule-selectors" style="display:flex; gap:10px; margin-top:10px;">
+                        <select id="routine-type" class="theme-select" style="flex:1;">
+                            <option value="daily">毎日</option>
+                            <option value="weekly">毎週</option>
+                            <option value="monthly">毎月</option>
+                            <option value="nth-weekday">第◯ ○曜日</option>
+                        </select>
+                        <select id="routine-value-weekly" class="theme-select hidden" style="flex:1;">
+                            <option value="0">日曜日</option>
+                            <option value="1">月曜日</option>
+                            <option value="2">火曜日</option>
+                            <option value="3">水曜日</option>
+                            <option value="4">木曜日</option>
+                            <option value="5">金曜日</option>
+                            <option value="6">土曜日</option>
+                        </select>
+                        <select id="routine-value-monthly" class="theme-select hidden" style="flex:1;">
+                            <!-- JS injected 1-31 -->
+                        </select>
+                        <div id="routine-value-nth" class="hidden" style="display:flex; gap:5px; flex:1;">
+                            <select id="routine-nth-week" class="theme-select" style="flex:1;">
+                                <option value="1">第1</option>
+                                <option value="2">第2</option>
+                                <option value="3">第3</option>
+                                <option value="4">第4</option>
+                                <option value="5">第5</option>
+                            </select>
+                            <select id="routine-nth-day" class="theme-select" style="flex:1;">
+                                <option value="0">日曜日</option>
+                                <option value="1">月曜日</option>
+                                <option value="2">火曜日</option>
+                                <option value="3">水曜日</option>
+                                <option value="4">木曜日</option>
+                                <option value="5">金曜日</option>
+                                <option value="6">土曜日</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="add-routine-btn" class="add-task-btn" style="width:100%; margin-top:15px; height:42px; font-size:14px;">このルールで登録</button>
+                </div>
+                <hr style="margin:25px 0; border:0; border-top:1px solid var(--border-color); opacity:0.3;">
+                <h3 style="font-size:14px; margin-bottom:15px; color:var(--text-muted);">現在のルーティン一覧</h3>
+                <ul id="routine-list" class="routine-list" style="list-style:none; padding:0; display:flex; flex-direction:column; gap:10px;">
+                    <!-- Routine list cards injected here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('SW registered successfully');
+                }).catch(err => {
+                    console.log('SW registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

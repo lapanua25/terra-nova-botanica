@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ivy-lee-cache-v8';
+const CACHE_NAME = 'ivy-lee-cache-v9';
 const urlsToCache = [
   './',
   './index.html',

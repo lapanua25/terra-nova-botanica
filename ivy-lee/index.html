@@ -121,6 +121,15 @@
                 <ul id="routine-list" class="routine-list" style="list-style:none; padding:0; display:flex; flex-direction:column; gap:10px;">
                     <!-- Routine list cards injected here -->
                 </ul>
+                <hr style="margin:25px 0; border:0; border-top:1px solid var(--border-color); opacity:0.3;">
+                <h3 style="font-size:14px; margin-bottom:15px; color:var(--text-muted);">📊 データ管理</h3>
+                <div style="display:flex; gap:10px; flex-direction:column;">
+                    <button id="export-data-btn" class="secondary-btn" style="width:100%; text-align:center;">📥 データをダウンロード</button>
+                    <div style="display:flex; gap:8px;">
+                        <input type="file" id="import-file-input" accept=".json" style="display:none;">
+                        <button id="import-data-btn" class="secondary-btn" style="flex:1;">📤 データをアップロード</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

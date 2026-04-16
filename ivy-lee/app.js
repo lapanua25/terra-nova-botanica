@@ -434,6 +434,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderHistory();
             }
         }
+
+        if (e.target.id === 'export-data-btn') {
+            exportData();
+        }
+
+        if (e.target.id === 'import-data-btn') {
+            document.getElementById('import-file-input').click();
+        }
+    });
+
+    document.getElementById('import-file-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            importData(file);
+            e.target.value = ''; // reset file input
+        }
     });
 
     const routineType = document.getElementById('routine-type');
@@ -586,10 +602,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const escapeHTML = (str) => {
-        return str.replace(/[&<>'"]/g, 
+        return str.replace(/[&<>'"]/g,
             tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
         );
     };
+
+    // ---- 7. Data Export/Import ----
+    function exportData() {
+        const dataStr = JSON.stringify(store, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ivy-lee-backup-${formatDateYMD(new Date())}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importData(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (!importedData.work || !importedData.private) {
+                    alert('❌ ファイルフォーマットが不正です。正しいバックアップファイルを選択してください。');
+                    return;
+                }
+                if (confirm('⚠️ 現在のデータをインポートしたファイルで完全に上書きします。よろしいですか？')) {
+                    store = importedData;
+                    saveStore();
+                    alert('✅ データをインポートしました。ページをリロードします。');
+                    location.reload();
+                }
+            } catch (error) {
+                alert('❌ ファイル読み込みエラー: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
 
     // INIT
     switchCategory(currentCategory, true);

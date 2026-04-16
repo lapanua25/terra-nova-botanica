@@ -235,9 +235,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       `,onClick:x=>{var S;x.target.closest("button")||(S=l.current)==null||S.focus()},children:[E.jsx("div",{className:"absolute top-2 right-2 text-border group-hover:text-primary transition-colors pointer-events-none",children:n?E.jsx(uS,{className:"w-4 h-4"}):null}),E.jsx("textarea",{ref:l,value:e.text,onChange:x=>{r(x.target.value),x.target.style.height="auto",x.target.style.height=x.target.scrollHeight+"px"},rows:1,placeholder:n?"メインテーマ":"要素を入力",className:`
           w-full resize-none bg-transparent outline-none
           text-center font-medium tracking-wide
-          overflow-hidden focus:ring-0 whitespace-pre-wrap
+          overflow-hidden focus:ring-0 whitespace-pre-wrap px-1
           ${n?"font-bold bg-clip-text text-transparent opacity-100 mix-blend-normal py-1":"text-textDefault py-0.5"}
-        `,style:{fontSize:`${c}px`,lineHeight:1.25,maxHeight:"100%",wordBreak:"break-all",overflowWrap:"break-word",WebkitTextFillColor:n&&e.text?"transparent":"initial",backgroundImage:n?"var(--center-text-start)":"none",backgroundColor:n?"var(--center-text-solid)":"transparent",display:"flex",alignItems:"center",marginTop:"auto",marginBottom:"auto"}}),!n&&i&&E.jsx("button",{onClick:p,className:`
+        `,style:{fontSize:`${Math.max(c,n&&!e.text?14:c)}px`,lineHeight:1.25,maxHeight:"100%",wordBreak:"break-word",overflowWrap:"break-word",WebkitTextFillColor:n&&e.text?"transparent":"initial",backgroundImage:n?"var(--center-text-start)":"none",backgroundColor:n?"var(--center-text-solid)":"transparent",display:"flex",alignItems:"center",justifyContent:"center",marginTop:"auto",marginBottom:"auto"}}),!n&&i&&E.jsx("button",{onClick:p,className:`
             absolute bottom-2 right-2 p-1.5 md:p-1.5 
             rounded-full transition-all duration-300 shadow-sm z-10
             opacity-100 md:opacity-0 md:group-hover:opacity-100

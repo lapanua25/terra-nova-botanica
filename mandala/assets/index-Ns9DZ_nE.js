@@ -252,7 +252,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           overflow-hidden focus:ring-0 whitespace-pre-wrap break-words
           placeholder-center
           ${n?"font-bold bg-clip-text text-transparent opacity-100 mix-blend-normal":"text-textDefault"}
-        `,style:{fontSize:`${c}px`,lineHeight:1.2,wordBreak:"break-word",overflowWrap:"break-word",textAlign:"center",WebkitTextFillColor:n&&e.text?"transparent":"initial",backgroundImage:n?"var(--center-text-start)":"none",backgroundColor:n?"var(--center-text-solid)":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",padding:"0"}}),!n&&i&&T.jsx("button",{onClick:p,className:`
+        `,style:{fontSize:`${c}px`,lineHeight:"inherit",height:"100%",wordBreak:"break-word",overflowWrap:"break-word",textAlign:"center",WebkitTextFillColor:n&&e.text?"transparent":"initial",backgroundImage:n?"var(--center-text-start)":"none",backgroundColor:n?"var(--center-text-solid)":"transparent",padding:"0",margin:"0",verticalAlign:"middle"}}),!n&&i&&T.jsx("button",{onClick:p,className:`
             absolute bottom-1.5 right-1.5 p-1 md:p-0.5
             rounded-lg transition-all duration-300 shadow-sm z-10
             opacity-100 md:opacity-0 md:group-hover:opacity-100

@@ -99,7 +99,14 @@ body[data-theme="dark"] .secondary-btn { background: rgba(255,255,255,0.1); }
 body[data-theme="dark"] .secondary-btn:hover { background: rgba(255,255,255,0.2); }
 
 .main-content {
-    flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; padding: 20px 0;
+    flex: 1; overflow: hidden; position: relative; padding: 20px 0;
+}
+
+.week-container-wrapper {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
 }
 
 .week-navigation {

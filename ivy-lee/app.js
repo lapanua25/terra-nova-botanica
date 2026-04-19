@@ -30,6 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const todayYMD = formatDateYMD(today);
     let currentStartDate = new Date(today);
 
+    // Get all existing dates from data
+    function getAllDates() {
+        const catData = store[currentCategory];
+        const dates = Object.keys(catData.tasksByDate || {}).sort();
+        return dates;
+    }
+
+    // Get min and max dates
+    function getDateRange() {
+        const dates = getAllDates();
+        if (dates.length === 0) {
+            const minDate = new Date(today);
+            minDate.setDate(minDate.getDate() - 365);
+            return { min: formatDateYMD(minDate), max: formatDateYMD(today) };
+        }
+        return { min: dates[0], max: dates[dates.length - 1] };
+    }
+
     // Initial Migration logic
     if (!store || (!store.work && !store.private)) {
         const oldTasksByDate = store?.tasksByDate || {};
@@ -86,91 +104,125 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ---- 3. Render UI (Weekly View) ----
+    // ---- 3. Render UI (Weekly View with Scroll) ----
     const weekContainer = document.getElementById('week-container');
+    const weekContainerWrapper = document.getElementById('week-container-wrapper');
     const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
-    
+    let isScrolling = false;
+    let scrollTimeout = null;
+
+    function getWeekStart(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        d.setDate(d.getDate() - day);
+        d.setHours(0,0,0,0);
+        return d;
+    }
+
     function renderWeek() {
         weekContainer.innerHTML = '';
         const catData = store[currentCategory];
+        const range = getDateRange();
 
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(currentStartDate);
-            d.setDate(d.getDate() + i);
-            const dateStr = formatDateYMD(d);
-            const isToday = dateStr === todayYMD;
-            const title = isToday ? `今日 ${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})` 
-                          : `${d.getMonth()+1}/${d.getDate()}(${dayNames[d.getDay()]})`;
+        // Calculate which weeks to render (current week ± surrounding weeks for scrolling)
+        const weekStart = getWeekStart(currentStartDate);
+        const minDate = new Date(range.min);
+        const maxDate = new Date(range.max);
+        maxDate.setDate(maxDate.getDate() + 6); // Include full last week
 
-            const tasks = catData.tasksByDate[dateStr] || [];
-            
-            // Auto-inject routines if space is available
-            if (tasks.length < 6) { injectRoutines(dateStr); }
-            const currentTasks = catData.tasksByDate[dateStr] || [];
+        let d = new Date(minDate);
+        d = getWeekStart(d);
 
-            const card = document.createElement('div');
-            card.className = `day-card ${isToday ? 'today-card' : ''}`;
-            
-            const disabledAttr = currentTasks.length >= 6 ? 'disabled' : '';
-            const placeholder = currentTasks.length >= 6 ? '最大6つまで設定可能' : '新しいタスクを追加...';
-            
-            let html = `
-                <div class="card-header">
-                    <h2>${title}</h2>
-                </div>
-                <div class="task-input-section">
-                    <input type="text" id="input-${dateStr}" placeholder="${placeholder}" ${disabledAttr}>
-                    <button class="add-task-btn" data-date="${dateStr}" ${disabledAttr}>追加</button>
-                </div>
-                <ul class="task-list" id="list-${dateStr}">
-            `;
-            
-            for (let j = 0; j < 6; j++) {
-                const task = currentTasks[j];
-                if (task) {
-                    html += `
-                        <li class="task-item ${task.completed ? 'completed' : ''}" data-date="${dateStr}" data-id="${task.id}">
-                            <div class="rank">${j + 1}</div>
-                            <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''} data-date="${dateStr}" data-id="${task.id}">
-                            <span class="task-text">${escapeHTML(task.text)}</span>
-                            <button class="delete-btn" aria-label="削除" data-date="${dateStr}" data-id="${task.id}">×</button>
-                            <div class="drag-handle" data-date="${dateStr}" data-id="${task.id}" title="ドラッグして並び替え">⠿</div>
-                        </li>
-                    `;
-                } else {
-                    html += `
-                        <li class="task-item empty">
-                            <div class="rank empty-rank">${j + 1}</div>
-                            <span class="task-text empty-text">未設定</span>
-                        </li>
-                    `;
+        // Render all weeks from min to max date
+        while (d < maxDate) {
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(d);
+                dayDate.setDate(dayDate.getDate() + i);
+                const dateStr = formatDateYMD(dayDate);
+                const isToday = dateStr === todayYMD;
+                const title = isToday ? `今日 ${dayDate.getMonth()+1}/${dayDate.getDate()}(${dayNames[dayDate.getDay()]})`
+                              : `${dayDate.getMonth()+1}/${dayDate.getDate()}(${dayNames[dayDate.getDay()]})`;
+
+                const tasks = catData.tasksByDate[dateStr] || [];
+
+                // Auto-inject routines if space is available
+                if (tasks.length < 6) { injectRoutines(dateStr); }
+                const currentTasks = catData.tasksByDate[dateStr] || [];
+
+                const card = document.createElement('div');
+                card.className = `day-card ${isToday ? 'today-card' : ''}`;
+                card.id = `card-${dateStr}`;
+
+                const disabledAttr = currentTasks.length >= 6 ? 'disabled' : '';
+                const placeholder = currentTasks.length >= 6 ? '最大6つまで設定可能' : '新しいタスクを追加...';
+
+                let html = `
+                    <div class="card-header">
+                        <h2>${title}</h2>
+                    </div>
+                    <div class="task-input-section">
+                        <input type="text" id="input-${dateStr}" placeholder="${placeholder}" ${disabledAttr}>
+                        <button class="add-task-btn" data-date="${dateStr}" ${disabledAttr}>追加</button>
+                    </div>
+                    <ul class="task-list" id="list-${dateStr}">
+                `;
+
+                for (let j = 0; j < 6; j++) {
+                    const task = currentTasks[j];
+                    if (task) {
+                        html += `
+                            <li class="task-item ${task.completed ? 'completed' : ''}" data-date="${dateStr}" data-id="${task.id}">
+                                <div class="rank">${j + 1}</div>
+                                <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''} data-date="${dateStr}" data-id="${task.id}">
+                                <span class="task-text">${escapeHTML(task.text)}</span>
+                                <button class="delete-btn" aria-label="削除" data-date="${dateStr}" data-id="${task.id}">×</button>
+                                <div class="drag-handle" data-date="${dateStr}" data-id="${task.id}" title="ドラッグして並び替え">⠿</div>
+                            </li>
+                        `;
+                    } else {
+                        html += `
+                            <li class="task-item empty">
+                                <div class="rank empty-rank">${j + 1}</div>
+                                <span class="task-text empty-text">未設定</span>
+                            </li>
+                        `;
+                    }
                 }
-            }
-            html += `</ul>`;
-            
-            const allCompleted = currentTasks.length > 0 && currentTasks.every(t => t.completed);
-            
-            if (currentTasks.some(t => !t.completed) || currentTasks.length === 0) {
-                const nextD = new Date(d);
-                nextD.setDate(nextD.getDate() + 1);
-                const nextDateStr = formatDateYMD(nextD);
-                
-                html += `
-                <div class="actions-section">
-                    <button class="carry-over-btn" data-date="${dateStr}" data-next="${nextDateStr}">
-                        未完了を翌日へ繰り越す
-                    </button>
-                </div>`;
-            } else if (allCompleted) {
-                html += `
-                <div class="actions-section">
-                    <div class="all-done-msg">🎊 すべて完了しました！</div>
-                </div>`;
-            }
+                html += `</ul>`;
 
-            card.innerHTML = html;
-            weekContainer.appendChild(card);
+                const allCompleted = currentTasks.length > 0 && currentTasks.every(t => t.completed);
+
+                if (currentTasks.some(t => !t.completed) || currentTasks.length === 0) {
+                    const nextD = new Date(dayDate);
+                    nextD.setDate(nextD.getDate() + 1);
+                    const nextDateStr = formatDateYMD(nextD);
+
+                    html += `
+                    <div class="actions-section">
+                        <button class="carry-over-btn" data-date="${dateStr}" data-next="${nextDateStr}">
+                            未完了を翌日へ繰り越す
+                        </button>
+                    </div>`;
+                } else if (allCompleted) {
+                    html += `
+                    <div class="actions-section">
+                        <div class="all-done-msg">🎊 すべて完了しました！</div>
+                    </div>`;
+                }
+
+                card.innerHTML = html;
+                weekContainer.appendChild(card);
+            }
+            d.setDate(d.getDate() + 7);
         }
+
+        // スクロール位置を今週にセット
+        setTimeout(() => {
+            const todayCard = document.getElementById(`card-${todayYMD}`);
+            if (todayCard) {
+                todayCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 50);
     }
 
     // ---- 4. Drag-to-reorder ----

@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Botanical Breed - 交配記録</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+/* 
+  styles.css
+  Rich Premium Dark Theme / Glassmorphism
+*/
+/* CSS Variables for Clean Modern UI (Apple/Linear Style) */
+:root {
+  --primary-color: #111827; /* Near Black */
+  --primary-color-hover: #374151;
+  --accent-color: #059669; /* Emerald for plant accents */
+  --background-color: #f9fafb; /* gray-50 */
+  --surface-color: #ffffff; 
+  --surface-hover: #f3f4f6;
+  --text-primary: #111827; 
+  --text-secondary: #6b7280; 
+  --border-color: #e5e7eb;
+  --danger-color: #ef4444; 
+  
+  --border-radius-lg: 16px;
+  --border-radius-md: 10px;
+  --border-radius-sm: 6px;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Card utility */
+.card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.container {
+  max-width: 600px; /* スマホ中心のレイアウトなので小さめに */
+  margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 80px; /* ボトムナビゲーション用の余白 */
+}
+
+/* Typography */
+h1, h2, h3 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.125rem; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover {
+  background-color: var(--surface-hover);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.form-control {
+  width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius-md);
+  background-color: transparent;
+  color: var(--text-primary);
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 1em;
+}
+
+select option {
+  background-color: var(--option-bg);
+  color: var(--text-primary);
+}
+
+/* Cards */
+.card {
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card:hover {
+  transform: translateY(-4px);
+  background: var(--surface-hover);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+.card:active {
+  transform: scale(0.98);
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 16px 0;
+  background: var(--surface-color);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
+  z-index: 100;
+  border-radius: 24px 24px 0 0;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.75rem;
+  gap: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.bottom-nav-item.active {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+/* Pedigree Tree */
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+.tree-node {
+  padding: 12px;
+  border-left: 4px solid var(--primary-color);
+  background: var(--surface-color);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  box-shadow: var(--shadow-sm);
+  margin-left: var(--indent, 0px);
+}
+.tree-node-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.tree-node-value {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Certificate */
+.certificate {
+  border: 8px solid var(--primary-color);
+  padding: 32px 16px;
+  text-align: center;
+  background: var(--surface-color);
+  border-radius: var(--border-radius-lg);
+  margin-top: 24px;
+}
+.certificate-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.certificate-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--secondary-color);
+  padding: 12px 0;
+  margin-bottom: 12px;
+}
+.certificate-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.certificate-value {
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+/* Utility */
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.text-center { text-align: center; }
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.category-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--surface-color);
+  border: 1px solid var(--secondary-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.category-tab.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+.gap-4 { gap: 16px; }
+
+/* Timeline styles */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+  margin-top: 24px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--secondary-color);
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 32px;
+}
+.timeline-dot {
+  position: absolute;
+  left: -24px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 4px solid var(--background-color);
+  z-index: 10;
+}
+.timeline-date {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.timeline-content {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Accordion interaction styles */
+details summary .feather-chevron-down {
+  transition: transform 0.3s ease-in-out;
+}
+details[open] > summary .feather-chevron-down {
+  transform: rotate(180deg);
+}
+  </style>
+
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+
+// --- Supabase Config ---
+const supabaseUrl = 'https://blnbyntjpddiyujuewsc.supabase.co';
+const supabaseKey = 'sb_publishable_xY0Paeugw3xB_yrMjhKmLQ_kUVrfZKE';
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+// --- Icons ---
+function Icon({ name, size = 24, className = "" }) {
+  useEffect(() => { feather.replace(); });
+  return <i data-feather={name} width={size} height={size} className={className}></i>;
+}
+
+// --- Image Utility ---
+const compressImage = (file, maxWidth, maxHeight, quality) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = event => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = error => reject(error);
+    };
+    reader.onerror = error => reject(error);
+  });
+};
+
+function dataURLtoBlob(dataurl) {
+    let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+}
+
+// --- Components ---
+
+function Settings({ settings, reloadData, existentCategories, currentTheme, onChangeTheme, userId }) {
+  const [newName, setNewName] = useState("");
+  const [newCategory, setNewCategory] = useState("共通");
+
+  const addSetting = async () => {
+    if (!newName.trim()) return;
+    await supabaseClient.from('settings').insert({ trait_name: newName.trim(), is_active: true, category: newCategory, user_id: userId });
+    setNewName("");
+    reloadData();
+  };
+
+  const toggleSetting = async (index) => {
+    const s = settings[index];
+    await supabaseClient.from('settings').update({ is_active: !s.isActive }).eq('id', s.id);
+    reloadData();
+  };
+
+  const editSetting = async (index) => {
+    const s = settings[index];
+    const newName = prompt("新しい項目名を入力してください", s.traitName);
+    if (newName && newName.trim()) {
+      await supabaseClient.from('settings').update({ trait_name: newName.trim() }).eq('id', s.id);
+      reloadData();
+    }
+  };
+
+  const removeSetting = async (index) => {
+    const s = settings[index];
+    if (window.confirm(`「${s.traitName}」を削除してもよろしいですか？`)) {
+      await supabaseClient.from('settings').delete().eq('id', s.id);
+      reloadData();
+    }
+  };
+
+  return (
+    <div className="container p-4">
+      <div className="glass card mb-4">
+        <h2 className="mb-2">デザインテーマ設定</h2>
+        <p className="text-secondary mb-4" style={{fontSize: '0.875rem'}}>お好みのカラーテーマを選択してください。</p>
+        <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
+          {[{id: 'emerald', label: 'エメラルド (Dark)'}, {id: 'light-leaf', label: 'ボタニカル (Light)'}, {id: 'amber', label: 'アンバー (Dark)'}, {id: 'ocean', label: 'オーシャン (Dark)'}].map(t => (
+             <button 
+                key={t.id} 
+                onClick={() => onChangeTheme(t.id)}
+                className={`btn ${currentTheme === t.id ? 'btn-primary' : 'btn-secondary'}`}
+                style={{flex: '1 1 calc(50% - 8px)', padding: '12px', fontSize: '0.875rem'}}
+             >
+                {t.label}
+             </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="glass card">
+        <h2>管理項目設定</h2>
+        <p className="text-secondary mb-4" style={{fontSize: '0.875rem'}}>形質評価ログで記録する項目を設定します。</p>
+        
+        <div className="form-group flex gap-2">
+        <select 
+          className="form-control" 
+          style={{width: '120px', padding: '0 12px', flexShrink: 0}} 
+          value={newCategory} 
+          onChange={(e) => setNewCategory(e.target.value)}
+        >
+          <option value="共通">共通</option>
+          {existentCategories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <input 
+          type="text" 
+          className="form-control" 
+          placeholder="項目名 (例: 葉の色)" 
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+        />
+        <button className="btn btn-primary" style={{width: 'auto', padding: '0 16px'}} onClick={addSetting}>
+          追加
+        </button>
+      </div>
+
+      <div className="flex" style={{flexDirection: 'column', gap: '8px'}}>
+        {settings.map((s, idx) => (
+          <div key={idx} className="card flex items-center justify-between" style={{margin: 0, padding: '12px'}}>
+            <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+               <span style={{fontWeight: 600}}>{s.traitName}</span>
+               <span style={{fontSize: '0.75rem', color: 'var(--text-secondary)'}}>対象: {s.category || '共通'}</span>
+            </div>
+            <div className="flex gap-2">
+              <button 
+                className="btn btn-secondary"
+                style={{width: 'auto', padding: '8px', fontSize: '0.75rem'}}
+                onClick={() => editSetting(idx)}
+                title="名前の編集"
+              >
+                <Icon name="edit-2" size={16} />
+              </button>
+              <button 
+                className={`btn ${s.isActive ? 'btn-primary' : 'btn-secondary'}`}
+                style={{width: 'auto', padding: '8px 12px', fontSize: '0.75rem'}}
+                onClick={() => toggleSetting(idx)}
+              >
+                {s.isActive ? "有効" : "無効"}
+              </button>
+              <button 
+                className="btn btn-secondary"
+                style={{width: 'auto', padding: '8px', fontSize: '0.75rem', color: 'var(--danger-color)'}}
+                onClick={() => removeSetting(idx)}
+                title="削除"
+              >
+                <Icon name="trash-2" size={16} />
+              </button>
+            </div>
+          </div>
+        ))}
+        {settings.length === 0 && <p className="text-secondary">設定項目がありません。</p>}
+      </div>
+    </div>
+    </div>
+  );
+}
+
+function IndividualForm({ onSave, onCancel, initialData, individuals }) {
+  const [data, setData] = useState(initialData || { name: "", manageId: "", category: "", breed: "", status: "育成中", sowingDate: "", motherId: "", fatherId: "", memo: "", imageUrl: "" });
+  const [imageLoading, setImageLoading] = useState(false);
+
+  const existentCategories = Array.from(new Set(individuals.map(i => i.category).filter(Boolean)));
+
+  const handleChange = (e) => {
+    setData({ ...data, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageLoading(true);
+      try {
+        const compressedBase64 = await compressImage(file, 800, 800, 0.7);
+        const blob = dataURLtoBlob(compressedBase64);
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+        const { data: uploadData, error } = await supabaseClient.storage.from('images').upload(fileName, blob, { contentType: 'image/jpeg' });
+        
+        if (error) throw error;
+        
+        const publicUrl = supabaseClient.storage.from('images').getPublicUrl(fileName).data.publicUrl;
+        setData({ ...data, imageUrl: publicUrl });
+      } catch(err) {
+        console.error(err);
+        alert("画像の処理・アップロードに失敗しました。詳細： " + err.message);
+      }
+      setImageLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(data);
+  };
+
+  return (
+    <form className="glass card" onSubmit={handleSubmit} style={{padding: '24px 16px', margin: 0}}>
+      <h2>{initialData ? "個体の編集" : "新規個体の登録"}</h2>
+      
+      <div className="form-group">
+        <label className="form-label">画像 (任意)</label>
+        {data.imageUrl && (
+          <div style={{marginBottom: '16px'}}>
+            <img src={data.imageUrl} style={{width: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '12px'}} />
+          </div>
+        )}
+        <label className="btn btn-secondary" style={{cursor: 'pointer'}}>
+          <Icon name="camera" />
+          {imageLoading ? "処理中..." : (data.imageUrl ? "画像を変更" : "写真を撮る / 選ぶ")}
+          <input type="file" accept="image/*" style={{display: 'none'}} onChange={handleImageChange} />
+        </label>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">種類 (大カテゴリ) *</label>
+        <input required type="text" name="category" list="category-list" className="form-control" placeholder="例: アガベ、塊根植物" value={data.category || ""} onChange={handleChange} />
+        <datalist id="category-list">
+           {existentCategories.map(c => <option key={c} value={c} />)}
+        </datalist>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">品種 *</label>
+        <input required type="text" name="breed" className="form-control" placeholder="例: チタノタ、オベサ" value={data.breed || ""} onChange={handleChange} />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">個体名 / 愛称 (任意)</label>
+        <input type="text" name="name" className="form-control" placeholder="例: 白鯨、特選株" value={data.name || ""} onChange={handleChange} />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">ユーザー管理番号 (任意)</label>
+        <input type="text" name="manageId" className="form-control" placeholder="例: EO-1" value={data.manageId || ""} onChange={handleChange} />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">ステータス</label>
+        <select name="status" className="form-control" value={data.status} onChange={handleChange}>
+          <option value="育成中">育成中</option>
+          <option value="売却済">売却済</option>
+          <option value="枯死">枯死</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">播種日</label>
+        <input type="date" name="sowingDate" className="form-control" value={data.sowingDate} onChange={handleChange} />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">母親（♀）</label>
+        <select name="motherId" className="form-control" value={data.motherId} onChange={handleChange}>
+          <option value="">-- 選択なし --</option>
+          {individuals.filter(i => i.id !== data.id).map(i => (
+            <option key={i.id} value={i.id}>{i.name} {i.category ? `[${i.category}]` : ''}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">父親（♂）</label>
+        <select name="fatherId" className="form-control" value={data.fatherId} onChange={handleChange}>
+          <option value="">-- 選択なし --</option>
+          {individuals.filter(i => i.id !== data.id).map(i => (
+            <option key={i.id} value={i.id}>{i.name} {i.category ? `[${i.category}]` : ''}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">メモ</label>
+        <textarea name="memo" className="form-control" rows="3" value={data.memo} onChange={handleChange}></textarea>
+      </div>
+
+      <div className="flex gap-4">
+        <button type="button" className="btn btn-secondary" onClick={onCancel}>キャンセル</button>
+        <button type="submit" className="btn btn-primary">保存</button>
+      </div>
+    </form>
+  );
+}
+
+function IndividualDetail({ id, individuals, traitLogs, settings, individualImages, goBack, updateIndividual, addTraitLog, addTimelineImage, deleteTimelineImage }) {
+  const [viewMode, setViewMode] = useState("detail"); // detail, traitForm, timelineForm, pedigree, certificate
+  const individual = individuals.find(i => i.id === id);
+  const activeSettings = settings.filter(s => s.isActive && (!s.category || s.category === "共通" || s.category === individual?.category));
+  const logs = traitLogs.filter(t => t.individualId === id).sort((a,b) => new Date(b.recordDate) - new Date(a.recordDate));
+  const timeline = (individualImages || []).filter(img => img.individualId === id).sort((a,b) => new Date(b.recordDate) - new Date(a.recordDate));
+  
+  if (!individual) return <div>見つかりません</div>;
+
+  const mother = individuals.find(i => i.id === individual.motherId);
+  const father = individuals.find(i => i.id === individual.fatherId);
+
+  // Form States
+  const [traitData, setTraitData] = useState({ recordDate: new Date().toISOString().split('T')[0], traitName: activeSettings[0]?.traitName || "", score: "3", note: "" });
+  const [timelineData, setTimelineData] = useState({ recordDate: new Date().toISOString().split('T')[0], imageUrl: "", notes: "" });
+  const [imageLoading, setImageLoading] = useState(false);
+
+  const handleTraitSubmit = (e) => {
+    e.preventDefault();
+    if (!traitData.traitName) return alert("評価項目が設定されていません");
+    addTraitLog({ ...traitData, individualId: id });
+    setViewMode("detail");
+  };
+
+  const handleTimelineSubmit = async (e) => {
+    e.preventDefault();
+    if (!timelineData.imageUrl) return alert("画像を選択してください");
+    await addTimelineImage({ ...timelineData, individualId: id });
+    setTimelineData({ recordDate: new Date().toISOString().split('T')[0], imageUrl: "", notes: "" });
+    setViewMode("detail");
+  };
+
+  const handleTimelineImageChange = async (e) => {
+    const file = e.target.files[0];
+    if(file) {
+      setImageLoading(true);
+      try {
+        const compressedBase64 = await compressImage(file, 800, 800, 0.7);
+        const blob = dataURLtoBlob(compressedBase64);
+        const fileName = `timeline_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+        const { data: uploadData, error } = await supabaseClient.storage.from('images').upload(fileName, blob, { contentType: 'image/jpeg' });
+        if (error) throw error;
+        const publicUrl = supabaseClient.storage.from('images').getPublicUrl(fileName).data.publicUrl;
+        setTimelineData({ ...timelineData, imageUrl: publicUrl });
+      } catch(err) {
+        alert("アップロード失敗: " + err.message);
+      }
+      setImageLoading(false);
+    }
+  };
+
+  const renderPedigreeNode = (nodeId, label, depth = 0) => {
+    if (!nodeId) return null;
+    const nodeData = individuals.find(i => i.id === nodeId);
+    if (!nodeData) return null;
+    return (
+      <div key={nodeId + label} className="tree-node" style={{'--indent': `${depth * 20}px`}}>
+        <div className="tree-node-label">{label}</div>
+        <div className="tree-node-value">{nodeData.name}</div>
+        {nodeData.motherId && renderPedigreeNode(nodeData.motherId, "母親 (♀)", depth + 1)}
+        {nodeData.fatherId && renderPedigreeNode(nodeData.fatherId, "父親 (♂)", depth + 1)}
+      </div>
+    );
+  };
+
+  return (
+    <div className="container">
+      <button className="btn btn-secondary mb-4" onClick={goBack} style={{width: 'auto', padding: '8px 16px'}}><Icon name="arrow-left" size={16}/> 戻る</button>
+      
+      {viewMode === "detail" && (
+        <>
+          <div className="card" style={{padding: '24px', marginBottom: '24px'}}>
+            {individual.imageUrl && (
+              <img src={individual.imageUrl} alt={individual.name} style={{width: '100%', borderRadius: '12px', marginBottom: '16px', objectFit: 'cover'}} loading="lazy" />
+            )}
+            <h1>{individual.name || "(名前なし)"} <span style={{fontSize: '1rem', fontWeight: 500, color: 'var(--text-secondary)'}}>{individual.manageId ? `#${individual.manageId}` : ''}</span></h1>
+            <p className="text-secondary mb-4">
+              {individual.category && <span style={{display: 'inline-block', backgroundColor: 'rgba(0,0,0,0.05)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.875rem', marginRight: '8px'}}>{individual.category}</span>}
+              {individual.breed && <span style={{display: 'inline-block', backgroundColor: 'var(--primary-color)', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontSize: '0.875rem', marginRight: '8px'}}>{individual.breed}</span>}
+            </p>
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px', fontSize: '0.9375rem'}}>
+              <div><strong>ステータス:</strong> {individual.status}</div>
+              <div><strong>播種日:</strong> {individual.sowingDate || "未設定"}</div>
+              <div><strong>母親 (♀):</strong> {mother ? mother.name : "不明"}</div>
+              <div><strong>父親 (♂):</strong> {father ? father.name : "不明"}</div>
+            </div>
+
+            {individual.memo && <p className="mb-2"><strong>メモ:</strong><br/>{individual.memo}</p>}
+          </div>
+
+          <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '24px'}}>
+             <button className="btn btn-primary" style={{flex: '1 1 auto', padding: '12px 8px', fontSize: '1rem'}} onClick={() => setViewMode("traitForm")}><Icon name="star" size={18}/> 評価</button>
+             <button className="btn btn-primary" style={{flex: '1 1 auto', padding: '12px 8px', fontSize: '1rem'}} onClick={() => setViewMode("timelineForm")}><Icon name="camera" size={18}/> 写真</button>
+             <button className="btn btn-secondary" style={{flex: '1 1 auto', padding: '12px 8px', fontSize: '1rem'}} onClick={() => setViewMode("editForm")}><Icon name="edit-2" size={18}/> 編集</button>
+             <button className="btn btn-secondary" style={{flex: '2 1 auto', padding: '8px', fontSize: '0.875rem'}} onClick={() => setViewMode("pedigree")}><Icon name="git-merge" size={14}/> 家系図</button>
+             <button className="btn btn-secondary" style={{flex: '2 1 auto', padding: '8px', fontSize: '0.875rem'}} onClick={() => setViewMode("certificate")}><Icon name="award" size={14}/> 証明</button>
+          </div>
+
+          <h3 className="mb-4">成長タイムライン</h3>
+          <div className="timeline">
+            <div className="timeline-item">
+              <div className="timeline-dot"></div>
+              <div className="timeline-date">{individual.sowingDate || "播種日不明"} (登録時)</div>
+              <div className="timeline-content">
+                {individual.imageUrl && <img src={individual.imageUrl} style={{width: '100%', borderRadius: '8px', marginBottom: '8px'}} loading="lazy" />}
+                <p style={{fontSize: '0.875rem'}}>{individual.memo || "最初の一歩。"}</p>
+              </div>
+            </div>
+            {timeline.map(item => (
+              <div key={item.id} className="timeline-item">
+                <div className="timeline-dot"></div>
+                <div className="timeline-date flex justify-between items-center">
+                  <span>{item.recordDate}</span>
+                  <button onClick={() => deleteTimelineImage(item.id)} style={{background: 'none', border: 'none', color: 'var(--danger-color)', padding: '4px'}}><Icon name="trash-2" size={14}/></button>
+                </div>
+                <div className="timeline-content">
+                  <img src={item.imageUrl} style={{width: '100%', borderRadius: '8px', marginBottom: '8px'}} loading="lazy" />
+                  {item.notes && <p style={{fontSize: '0.875rem'}}>{item.notes}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <h3 className="mt-8 mb-4">評価ログ</h3>
+
+          {logs.length === 0 ? <p className="text-secondary">まだ評価がありません。</p> : (
+            logs.map(log => (
+              <div key={log.id} className="card glass">
+                <div className="flex justify-between items-center mb-2">
+                  <strong>{log.traitName}</strong>
+                  <span style={{color: 'var(--primary-color)', fontSize: '1.25rem', fontWeight: 800}}>★{log.score}</span>
+                </div>
+                <div className="text-secondary font-sm flex justify-between">
+                  <span>{log.recordDate}</span>
+                  <span>{log.note}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </>
+      )}
+
+      {viewMode === "traitForm" && (
+        <form className="glass card" onSubmit={handleTraitSubmit}>
+          <h2 className="mb-4">新しい評価を記録</h2>
+          <div className="form-group">
+            <label className="form-label">記録日</label>
+            <input required type="date" className="form-control" value={traitData.recordDate} onChange={e => setTraitData({...traitData, recordDate: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">評価項目</label>
+            <select required className="form-control" value={traitData.traitName} onChange={e => setTraitData({...traitData, traitName: e.target.value})}>
+              {activeSettings.map(s => <option key={s.traitName} value={s.traitName}>{s.traitName}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">スコア (1-5)</label>
+            <input required type="number" min="1" max="5" className="form-control" value={traitData.score} onChange={e => setTraitData({...traitData, score: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">備考</label>
+            <input type="text" className="form-control" value={traitData.note} onChange={e => setTraitData({...traitData, note: e.target.value})} />
+          </div>
+          <div className="flex gap-4">
+             <button type="button" className="btn btn-secondary" onClick={() => setViewMode("detail")}>キャンセル</button>
+             <button type="submit" className="btn btn-primary">保存</button>
+          </div>
+        </form>
+      )}
+
+      {viewMode === "timelineForm" && (
+        <form className="glass card" onSubmit={handleTimelineSubmit}>
+          <h2 className="mb-4">成長記録（写真）を追加</h2>
+          <div className="form-group">
+            <label className="form-label">撮影日</label>
+            <input required type="date" className="form-control" value={timelineData.recordDate} onChange={e => setTimelineData({...timelineData, recordDate: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">写真</label>
+            {timelineData.imageUrl && <img src={timelineData.imageUrl} style={{width: '100%', borderRadius: '12px', marginBottom: '16px'}} />}
+            <label className="btn btn-secondary" style={{cursor: 'pointer'}}>
+              <Icon name="camera" /> {imageLoading ? "処理中..." : (timelineData.imageUrl ? "写真を変更" : "写真を選ぶ")}
+              <input type="file" accept="image/*" style={{display: 'none'}} onChange={handleTimelineImageChange} />
+            </label>
+          </div>
+          <div className="form-group">
+            <label className="form-label">コメント (任意)</label>
+            <textarea className="form-control" rows="2" placeholder="例: 新芽が出てきました" value={timelineData.notes} onChange={e => setTimelineData({...timelineData, notes: e.target.value})}></textarea>
+          </div>
+          <div className="flex gap-4">
+             <button type="button" className="btn btn-secondary" onClick={() => setViewMode("detail")}>キャンセル</button>
+             <button type="submit" className="btn btn-primary" disabled={imageLoading}>保存</button>
+          </div>
+        </form>
+      )}
+
+
+      {viewMode === "pedigree" && (
+        <div className="glass card">
+          <button className="btn btn-secondary mb-4" onClick={() => setViewMode("detail")} style={{width: 'auto', padding: '8px 16px'}}><Icon name="arrow-left" size={16}/> 戻る</button>
+          <h2 className="mb-2">家系図</h2>
+          <div className="tree">
+            <div className="tree-node">
+              <div className="tree-node-label">対象個体</div>
+              <div className="tree-node-value">{individual.name}</div>
+              {individual.motherId && renderPedigreeNode(individual.motherId, "母親 (♀)", 1)}
+              {individual.fatherId && renderPedigreeNode(individual.fatherId, "父親 (♂)", 1)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewMode === "certificate" && (
+         <div className="glass card" style={{background: '#fff', color: '#000'}}>
+             <button className="btn btn-secondary mb-4" onClick={() => setViewMode("detail")} style={{width: 'auto', padding: '8px 16px'}}><Icon name="arrow-left" size={16}/> 戻る</button>
+             <div className="certificate">
+                 <div className="certificate-title">交配証明書</div>
+                 {individual.imageUrl && (
+                   <div style={{marginBottom: '24px'}}>
+                     <img src={individual.imageUrl} style={{width: '200px', height: '200px', objectFit: 'cover', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}} />
+                   </div>
+                 )}
+                 <div className="certificate-row">
+                    <span className="certificate-label">個体名</span>
+                    <span className="certificate-value">{individual.name || "(名前なし)"} {individual.breed && <span style={{fontSize: '0.8rem', backgroundColor: '#e2e8f0', padding: '2px 8px', borderRadius: '8px', color: '#4a5568', verticalAlign: 'middle', marginLeft: '6px'}}>{individual.breed}</span>}</span>
+                 </div>
+                 <div className="certificate-row">
+                    <span className="certificate-label">管理番号</span>
+                    <span className="certificate-value" style={{fontFamily: 'monospace'}}>{individual.manageId || "未設定"}</span>
+                 </div>
+                 <div className="certificate-row" style={{flexDirection: 'column', alignItems: 'center', borderBottom: 'none'}}>
+                    <span className="certificate-label" style={{marginBottom: '16px'}}>交配親 (♀ × ♂)</span>
+                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', width: '100%'}}>
+                       <div style={{textAlign: 'center', flex: 1}}>
+                          {mother && mother.imageUrl ? (
+                             <img src={mother.imageUrl} style={{width: '64px', height: '64px', borderRadius: '32px', objectFit: 'cover', marginBottom: '8px'}} />
+                          ) : (
+                             <div style={{width: '64px', height: '64px', borderRadius: '32px', background: '#f4f4f5', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', color: '#a1a1aa'}}><Icon name="image" /></div>
+                          )}
+                          <div style={{fontWeight: 600, fontSize: '0.875rem'}}>{mother ? mother.name : "不明"}</div>
+                          <div style={{fontSize: '0.75rem', color: '#ff4d4f'}}>♀ 母親</div>
+                       </div>
+                       <div style={{fontSize: '1.5rem', fontWeight: 800, color: '#a1a1aa'}}>×</div>
+                       <div style={{textAlign: 'center', flex: 1}}>
+                          {father && father.imageUrl ? (
+                             <img src={father.imageUrl} style={{width: '64px', height: '64px', borderRadius: '32px', objectFit: 'cover', marginBottom: '8px'}} />
+                          ) : (
+                             <div style={{width: '64px', height: '64px', borderRadius: '32px', background: '#f4f4f5', border: '1px solid #e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', color: '#a1a1aa'}}><Icon name="image" /></div>
+                          )}
+                          <div style={{fontWeight: 600, fontSize: '0.875rem'}}>{father ? father.name : "不明"}</div>
+                          <div style={{fontSize: '0.75rem', color: '#1890ff'}}>♂ 父親</div>
+                       </div>
+                    </div>
+                 </div>
+                 <div style={{borderBottom: '1px dashed var(--secondary-color)', marginBottom: '12px'}}></div>
+                 <div className="certificate-row">
+                    <span className="certificate-label">播種日</span>
+                    <span className="certificate-value">{individual.sowingDate || "不明"}</span>
+                 </div>
+                 <div className="certificate-row">
+                    <span className="certificate-label">UUID</span>
+                    <span className="certificate-value" style={{fontSize: '0.75rem', fontFamily: 'monospace', color: '#a1a1aa'}}>{individual.id}</span>
+                 </div>
+                 <div style={{marginTop: '32px', textAlign: 'right', fontSize: '0.75rem', color: '#666'}}>
+                     Issued by Breeding Management App
+                 </div>
+             </div>
+             <button className="btn btn-primary mt-4" style={{marginTop: '16px'}} onClick={() => window.print()}><Icon name="printer" /> 印刷 / PDF保存</button>
+         </div>
+      )}
+
+      {viewMode === "editForm" && (
+        <div style={{marginTop: '0px'}}>
+          <IndividualForm 
+            initialData={individual} 
+            individuals={individuals} 
+            onSave={(data) => { updateIndividual(data); setViewMode("detail"); }} 
+            onCancel={() => setViewMode("detail")} 
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Dashboard({ individuals, onSelect, onNew }) {
+  const [search, setSearch] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const categories = useMemo(() => Array.from(new Set(individuals.map(i => i.category).filter(Boolean))), [individuals]);
+
+  const filtered = individuals.filter(i => {
+    const matchSearch = i.name.toLowerCase().includes(search.toLowerCase()) || i.id.includes(search);
+    const matchCategory = selectedCategory ? i.category === selectedCategory : true;
+    return matchSearch && matchCategory;
+  });
+
+  const grouped = useMemo(() => {
+    const groups = {};
+    filtered.forEach(i => {
+      const cat = i.category || "未分類";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(i);
+    });
+    return groups;
+  }, [filtered]);
+
+  return (
+    <div className="container" style={{paddingTop: '24px'}}>
+      
+      {/* Hero / Stats Banner */}
+      <div className="glass p-4 card" style={{marginBottom: '24px', background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(0,0,0,0))', border: '1px solid rgba(16,185,129,0.2)'}}>
+        <h1 className="mb-2" style={{color: 'var(--primary-color)'}}>
+          {individuals.length === 0 ? "ようこそ！🌱" : "マイコレクション"}
+        </h1>
+        {individuals.length === 0 ? (
+          <p className="text-secondary" style={{fontSize: '0.875rem', lineHeight: 1.6}}>
+            まだ植物が登録されていません。<br/>
+            下の「新規登録」ボタンから、お気に入りの植物や交配の親株を追加して、成長の記録を始めましょう！
+          </p>
+        ) : (
+          <div style={{display: 'flex', gap: '12px'}}>
+             <div style={{flex: 1, textAlign: 'center', background: 'var(--background-color)', padding: '12px', borderRadius: '16px', border: '1px solid var(--secondary-color)'}}>
+                <div style={{fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px'}}>総登録数</div>
+                <div style={{fontSize: '1.5rem', fontWeight: 800}}>{individuals.length}</div>
+             </div>
+             <div style={{flex: 1, textAlign: 'center', background: 'var(--background-color)', padding: '12px', borderRadius: '16px', border: '1px solid var(--secondary-color)'}}>
+                <div style={{fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px'}}>育成中</div>
+                <div style={{fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-color)'}}>{individuals.filter(i => i.status === '育成中').length}</div>
+             </div>
+          </div>
+        )}
+      </div>
+
+      <div className="glass p-4 card" style={{marginBottom: '24px'}}>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
+           <button className={`btn ${isSearchOpen ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setIsSearchOpen(!isSearchOpen)} style={{padding: '8px 12px', width: 'auto'}} title="検索">
+              <Icon name="search" size={20} /> 検索
+           </button>
+           <button className="btn btn-primary" onClick={onNew} style={{width: 'auto'}}><Icon name="plus" size={20} /> 新規登録</button>
+        </div>
+
+        {isSearchOpen && (
+          <div className="form-group mb-4" style={{animation: 'fadeIn 0.3s ease', margin: '0 -8px'}}>
+            <input 
+              type="text" 
+              className="form-control" 
+              placeholder="品種名や個体名で検索..." 
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              autoFocus
+            />
+          </div>
+        )}
+
+        {categories.length > 0 && (
+          <div className="flex gap-2" style={{overflowX: 'auto', paddingBottom: '8px', margin: '0 -8px', padding: '0 8px'}}>
+            <button className={`category-tab ${selectedCategory === "" ? "active" : ""}`} onClick={() => setSelectedCategory("")}>すべて</button>
+            {categories.map(c => (
+              <button key={c} className={`category-tab ${selectedCategory === c ? "active" : ""}`} onClick={() => setSelectedCategory(c)}>{c}</button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="list">
+        {Object.keys(grouped).sort((a,b) => a === "未分類" ? 1 : b === "未分類" ? -1 : a.localeCompare(b)).map(cat => {
+          // 品種ごとにさらにグループ化
+          const breedGroups = {};
+          grouped[cat].forEach(i => {
+             const br = i.breed || "品種不明";
+             if(!breedGroups[br]) breedGroups[br] = [];
+             breedGroups[br].push(i);
+          });
+          
+          return (
+            <details key={cat} style={{marginBottom: '24px'}} open={true}>
+               <summary style={{fontSize: '1.25rem', color: 'var(--primary-color)', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px', fontWeight: 700, cursor: 'pointer', outline: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                 <span>{cat} <span style={{fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 400, marginLeft: '4px'}}>({grouped[cat].length}株)</span></span>
+                 <Icon name="chevron-down" size={24} color="var(--text-secondary)" />
+               </summary>
+               
+               <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px'}}>
+                 {Object.keys(breedGroups).sort().map(br => (
+                    <details key={br} className="card" style={{padding: '0', overflow: 'hidden'}} open={Object.keys(breedGroups).length <= 2}>
+                       <summary style={{padding: '16px', fontWeight: 600, cursor: 'pointer', background: 'var(--surface-color)', outline: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                         <span>{br} <span style={{color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 400, marginLeft: '8px'}}>{breedGroups[br].length}株</span></span>
+                         <Icon name="chevron-down" size={20} color="var(--text-secondary)" />
+                       </summary>
+                       <div style={{padding: '0 16px 16px 16px', display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                         {breedGroups[br].map(i => (
+                            <div key={i.id} className="card flex items-center gap-4" style={{padding: '12px', cursor: 'pointer', boxShadow: 'none', border: '1px solid var(--border-color)'}} onClick={() => onSelect(i.id)}>
+                               {i.imageUrl ? (
+                                 <img src={i.imageUrl} style={{width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0}} loading="lazy" />
+                               ) : (
+                                 <div style={{width: '60px', height: '60px', borderRadius: '8px', background: 'var(--surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                                     <Icon name="image" size={24} color="var(--text-secondary)" />
+                                 </div>
+                               )}
+                               <div style={{flex: 1}}>
+                                   <div style={{display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px'}}>
+                                     <h3 style={{margin: 0, fontSize: '1rem'}}>{i.name || "(名前なし)"}</h3>
+                                     <span style={{fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500}}>{i.manageId ? `#${i.manageId}` : ''}</span>
+                                   </div>
+                                   <div className="flex justify-between text-secondary" style={{fontSize: '0.8125rem'}}>
+                                     <span>{i.status}</span>
+                                     <span>{i.sowingDate}</span>
+                                   </div>
+                               </div>
+                            </div>
+                         ))}
+                       </div>
+                    </details>
+                 ))}
+               </div>
+            </details>
+          );
+        })}
+        {filtered.length === 0 && <p className="text-center text-secondary">登録データがありません。</p>}
+      </div>
+    </div>
+  );
+}
+
+function Auth() {
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    let error;
+    if (isLogin) {
+      const res = await supabaseClient.auth.signInWithPassword({ email, password });
+      error = res.error;
+    } else {
+      const res = await supabaseClient.auth.signUp({ email, password });
+      error = res.error;
+      if (!error) alert("アカウントが作成されました！");
+    }
+    setLoading(false);
+    if (error) alert("エラー: " + error.message);
+  };
+
+  return (
+    <div style={{display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', padding: '16px'}}>
+       <div className="card" style={{width: '100%', maxWidth: '400px', padding: '32px'}}>
+          <div style={{textAlign: 'center', marginBottom: '32px'}}>
+             <Icon name="feather" size={48} color="var(--primary-color)" />
+             <h1 style={{marginTop: '16px'}}>Botanical Breed</h1>
+             <p className="text-secondary" style={{fontSize: '0.875rem'}}>商用SaaS版プロトタイプ</p>
+          </div>
+          <form onSubmit={handleAuth}>
+             <div className="form-group">
+                <label className="form-label">メールアドレス</label>
+                <input required type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} />
+             </div>
+             <div className="form-group">
+                <label className="form-label">パスワード (6文字以上)</label>
+                <input required type="password" minLength="6" className="form-control" value={password} onChange={e => setPassword(e.target.value)} />
+             </div>
+             <button type="submit" className="btn btn-primary" style={{width: '100%', marginTop: '8px'}} disabled={loading}>
+                {loading ? "通信中..." : (isLogin ? "ログインして始める" : "新規アカウント作成")}
+             </button>
+          </form>
+          <div style={{textAlign: 'center', marginTop: '24px'}}>
+             <button style={{background: 'none', border: 'none', color: 'var(--text-secondary)', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.875rem'}} onClick={() => setIsLogin(!isLogin)}>
+                {isLogin ? "パスワードを作って新規登録する" : "すでにアカウントをお持ちの方はこちら"}
+             </button>
+          </div>
+       </div>
+    </div>
+  );
+}
+
+function App() {
+  const [session, setSession] = useState(null);
+  const [currentTab, setCurrentTab] = useState("dashboard"); // dashboard, new, detail, settings
+  const [selectedId, setSelectedId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+  }, []);
+
+  // UI Theme Setting
+  const [theme, setTheme] = useState(() => localStorage.getItem('app_ui_theme') || 'emerald');
+  useEffect(() => {
+     localStorage.setItem('app_ui_theme', theme);
+     document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const [individuals, setIndividuals] = useState([]);
+  const [traitLogs, setTraitLogs] = useState([]);
+  const [individualImages, setIndividualImages] = useState([]);
+  const [settings, setSettings] = useState([]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const [indRes, logRes, setRes, imgRes] = await Promise.all([
+      supabaseClient.from('individuals').select('*').order('created_at', { ascending: false }),
+      supabaseClient.from('trait_logs').select('*').order('created_at', { ascending: false }),
+      supabaseClient.from('settings').select('*').order('created_at', { ascending: true }),
+      supabaseClient.from('individual_images').select('*').order('record_date', { ascending: false })
+    ]);
+    
+    if (indRes.data) {
+       setIndividuals(indRes.data.map(i => ({...i, breed: i.breed, manageId: i.manage_id, sowingDate: i.sowing_date, motherId: i.mother_id, fatherId: i.father_id, imageUrl: i.image_url})));
+    }
+    if (logRes.data) {
+       setTraitLogs(logRes.data.map(l => ({...l, individualId: l.individual_id, recordDate: l.record_date, traitName: l.trait_name, note: l.notes})));
+    }
+    if (setRes.data) {
+       if (setRes.data.length === 0) {
+          // 初期設定データ
+          const defaults = [
+            { trait_name: "棘の鋭さ", is_active: true, category: "共通", user_id: session.user.id },
+            { trait_name: "葉の色", is_active: true, category: "共通", user_id: session.user.id },
+            { trait_name: "形のバランス", is_active: true, category: "共通", user_id: session.user.id }
+          ];
+          await supabaseClient.from('settings').insert(defaults);
+          fetchData(); 
+          return;
+       }
+       setSettings(setRes.data.map(s => ({...s, traitName: s.trait_name, isActive: s.is_active})));
+    }
+    if (imgRes.data) {
+       setIndividualImages(imgRes.data.map(img => ({...img, individualId: img.individual_id, recordDate: img.record_date})));
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (session) {
+      fetchData();
+    }
+  }, [session]);
+
+
+  const saveIndividual = async (data) => {
+    const dbData = {
+      name: data.name,
+      manage_id: data.manageId || null,
+      category: data.category,
+      breed: data.breed || null,
+      status: data.status,
+      sowing_date: data.sowingDate || null,
+      mother_id: data.motherId || null,
+      father_id: data.fatherId || null,
+      memo: data.memo,
+      image_url: data.imageUrl,
+      user_id: session.user.id
+    };
+
+    if (data.id) {
+       await supabaseClient.from('individuals').update(dbData).eq('id', data.id);
+       await fetchData();
+    } else {
+       await supabaseClient.from('individuals').insert(dbData);
+       await fetchData();
+       setCurrentTab("dashboard");
+    }
+  };
+
+  const addTraitLog = async (data) => {
+    const dbData = {
+       individual_id: data.individualId,
+       record_date: data.recordDate,
+       trait_name: data.traitName,
+       score: data.score,
+       notes: data.note,
+       user_id: session.user.id
+    };
+    await supabaseClient.from('trait_logs').insert(dbData);
+    await fetchData();
+  };
+
+  const addTimelineImage = async (data) => {
+    const dbData = {
+      individual_id: data.individualId,
+      image_url: data.imageUrl,
+      record_date: data.recordDate,
+      notes: data.notes,
+      user_id: session.user.id
+    };
+    await supabaseClient.from('individual_images').insert(dbData);
+    await fetchData();
+  };
+
+  const deleteTimelineImage = async (id) => {
+    if(window.confirm("この写真を削除してもよろしいですか？")) {
+      await supabaseClient.from('individual_images').delete().eq('id', id);
+      await fetchData();
+    }
+  };
+
+  if (!session) {
+     return <Auth />;
+  }
+
+  if (loading && individuals.length === 0) {
+    return <div style={{display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center'}}>データを読み込み中...</div>;
+  }
+
+
+  return (
+    <div>
+      <div style={{
+        padding: '16px', 
+        background: 'var(--surface-color)', 
+        borderBottom: '1px solid var(--border-color)', 
+        position: 'sticky', 
+        top: 0, 
+        zIndex: 50, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        gap: '8px'
+      }}>
+         <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+           <Icon name="feather" color="var(--primary-color)" />
+           <span style={{fontWeight: 800, fontSize: '1.125rem'}}>
+             Botanical Breed
+           </span>
+         </div>
+         <button className="btn btn-secondary" style={{width: 'auto', padding: '6px 12px', fontSize: '0.75rem'}} onClick={() => supabaseClient.auth.signOut()}>
+           ログアウト
+         </button>
+      </div>
+
+      {/* Main Content Area */}
+      <div style={{minHeight: '100vh', paddingBottom: '90px'}}>
+        {currentTab === "dashboard" && <Dashboard individuals={individuals} onSelect={id => { setSelectedId(id); setCurrentTab("detail"); }} onNew={() => setCurrentTab("new")} />}
+        {currentTab === "settings" && <Settings settings={settings} reloadData={fetchData} currentTheme={theme} onChangeTheme={setTheme} existentCategories={Array.from(new Set(individuals.map(i => i.category).filter(Boolean)))} userId={session.user.id} />}
+        {currentTab === "new" && (
+           <div className="container" style={{paddingTop: '24px'}}>
+             <IndividualForm onSave={saveIndividual} onCancel={() => setCurrentTab("dashboard")} individuals={individuals} />
+           </div>
+        )}
+        {currentTab === "detail" && selectedId && (
+           <IndividualDetail 
+             id={selectedId} 
+             individuals={individuals} 
+             traitLogs={traitLogs} 
+             settings={settings}
+             individualImages={individualImages}
+             updateIndividual={saveIndividual}
+             addTraitLog={addTraitLog}
+             addTimelineImage={addTimelineImage}
+             deleteTimelineImage={deleteTimelineImage}
+             goBack={() => setCurrentTab("dashboard")} 
+           />
+        )}
+
+      </div>
+
+      {/* Bottom Navigation */}
+      <nav className="bottom-nav">
+        <button className={`bottom-nav-item ${currentTab === "dashboard" || currentTab === "detail" || currentTab === "new" ? "active" : ""}`} onClick={() => setCurrentTab("dashboard")}>
+          <Icon name="home" />
+          ホーム
+        </button>
+        <button className={`bottom-nav-item ${currentTab === "settings" ? "active" : ""}`} onClick={() => setCurrentTab("settings")}>
+          <Icon name="settings" />
+          設定
+        </button>
+      </nav>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+  </script>
+</body>
+</html>

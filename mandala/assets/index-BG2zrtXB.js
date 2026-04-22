@@ -250,12 +250,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             absolute inset-0 flex items-center justify-center
             pointer-events-none text-center font-medium tracking-wide px-2
             ${n?"font-bold":"text-textSecondary"}
-          `,style:{fontSize:`${c}px`,lineHeight:"1.4"},children:n?"メインテーマ":"要素を入力"}),T.jsx("textarea",{ref:l,value:e.text,onChange:v=>{var _;r(v.target.value),v.target.style.height="auto",v.target.style.height=Math.min(v.target.scrollHeight,((_=v.target.parentElement)==null?void 0:_.clientHeight)||100)+"px"},onFocus:v=>{var _;v.target.style.height="auto",v.target.style.height=Math.min(v.target.scrollHeight,((_=v.target.parentElement)==null?void 0:_.clientHeight)||100)+"px"},className:`
+          `,style:{fontSize:`${c}px`,lineHeight:"1.4"},children:n?"メインテーマ":"要素を入力"}),T.jsx("textarea",{ref:l,value:e.text,onChange:v=>{var w;r(v.target.value),v.target.style.height="auto";const _=v.target.scrollHeight,m=((w=v.target.parentElement)==null?void 0:w.clientHeight)||100,y=Math.min(_,m);if(v.target.style.height=y+"px",_<m){const x=(m-_)/2;v.target.style.paddingTop=x+"px",v.target.style.paddingBottom=x+"px"}},onFocus:v=>{var w;v.target.style.height="auto";const _=v.target.scrollHeight,m=((w=v.target.parentElement)==null?void 0:w.clientHeight)||100,y=Math.min(_,m);if(v.target.style.height=y+"px",_<m){const x=(m-_)/2;v.target.style.paddingTop=x+"px",v.target.style.paddingBottom=x+"px"}},className:`
           w-full resize-none bg-transparent outline-none
           text-center font-medium tracking-wide
           focus:ring-0 whitespace-pre-wrap break-words relative z-10
           ${n?"font-bold bg-clip-text text-transparent opacity-100 mix-blend-normal":"text-textDefault"}
-        `,style:{fontSize:`${c}px`,lineHeight:"1.4",minHeight:"100%",maxHeight:"100%",width:"100%",wordBreak:"break-word",overflowWrap:"break-word",textAlign:"center",WebkitTextFillColor:n&&e.text?"transparent":"initial",backgroundImage:n?"var(--center-text-start)":"none",backgroundColor:n?"var(--center-text-solid)":"transparent",padding:"4px 0",margin:"0",border:"none",overflow:"hidden"}}),!n&&i&&T.jsx("button",{onClick:p,className:`
+        `,style:{fontSize:`${c}px`,lineHeight:"1.4",height:"100%",width:"100%",wordBreak:"break-word",overflowWrap:"break-word",textAlign:"center",WebkitTextFillColor:n&&e.text?"transparent":"initial",backgroundImage:n?"var(--center-text-start)":"none",backgroundColor:n?"var(--center-text-solid)":"transparent",padding:"0",margin:"auto",border:"none",overflow:"hidden",display:"block",boxSizing:"border-box"}}),!n&&i&&T.jsx("button",{onClick:p,className:`
             absolute bottom-1.5 right-1.5 p-1 md:p-0.5
             rounded-lg transition-all duration-300 shadow-sm z-10
             opacity-100 md:opacity-0 md:group-hover:opacity-100

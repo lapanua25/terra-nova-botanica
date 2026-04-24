@@ -122,7 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
     saveStore();
     
     // Further check for extremely old "ivyLeeTasks" object
-    const oldTasks = JSON.parse(localStorage.getItem('ivyLeeTasks'));
+    const oldTasksStr = localStorage.getItem('ivyLeeTasks');
+    const oldTasks = oldTasksStr ? JSON.parse(oldTasksStr) : null;
     if (oldTasks && Object.keys(store.work.tasksByDate).length === 0) {
         store.work.tasksByDate[todayYMD] = oldTasks.map(t => ({ 
             id: generateId(), text: t.text, completed: t.completed 

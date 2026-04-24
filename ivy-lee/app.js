@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ---- 0. Firebase Initialization ----
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-tZ77oTb6Wh4VowihOe00u5qLURiyRIw",
+      authDomain: "ivy-lee-method-2f615.firebaseapp.com",
+      projectId: "ivy-lee-method-2f615",
+      storageBucket: "ivy-lee-method-2f615.firebasestorage.app",
+      messagingSenderId: "93433529823",
+      appId: "1:93433529823:web:535030e3e9a7f84f0ff06a",
+      measurementId: "G-YJ2370GXS4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let useFirestore = false;
+
     // ---- 1. Data Store Initialization & Migration ----
     let rawStore = localStorage.getItem('ivyLeeData');
     let store = rawStore ? JSON.parse(rawStore) : null;
@@ -20,9 +38,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tools
     function generateId() { return Math.random().toString(36).substr(2, 9); }
-    function saveStore() { localStorage.setItem('ivyLeeData', JSON.stringify(store)); }
     function formatDateYMD(d) {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function saveStore() {
+        // Always save to localStorage
+        localStorage.setItem('ivyLeeData', JSON.stringify(store));
+
+        // If logged in, also save to Firestore
+        if (useFirestore && currentUser) {
+            db.collection('users').doc(currentUser.uid).set({
+                data: store,
+                lastUpdated: new Date().toISOString()
+            }).catch(error => {
+                console.error('Firestore save error:', error);
+            });
+        }
+    }
+
+    async function loadDataFromFirestore() {
+        if (!currentUser) return;
+
+        try {
+            const doc = await db.collection('users').doc(currentUser.uid).get();
+            if (doc.exists) {
+                // Load from Firestore
+                store = doc.data().data;
+                console.log('Data loaded from Firestore');
+            } else {
+                // First-time user - migrate LocalStorage data to Firestore
+                await db.collection('users').doc(currentUser.uid).set({
+                    data: store,
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log('New user - initial data saved to Firestore');
+            }
+            switchCategory(currentCategory, true);
+        } catch (error) {
+            console.error('Firestore load error:', error);
+            // Fallback to LocalStorage on error
+            switchCategory(currentCategory, true);
+        }
     }
 
     const today = new Date();
@@ -102,6 +159,59 @@ document.addEventListener('DOMContentLoaded', () => {
             const cat = e.currentTarget.getAttribute('data-category');
             if (currentCategory !== cat) switchCategory(cat);
         });
+    });
+
+    // ---- 2.5. Firebase Authentication ----
+    const googleLoginBtn = document.getElementById('google-login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userInfo = document.getElementById('user-info');
+    const userEmail = document.getElementById('user-email');
+
+    googleLoginBtn.addEventListener('click', () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider)
+            .then(() => {
+                console.log('Google ログイン成功');
+            })
+            .catch((error) => {
+                console.error('ログインエラー:', error);
+                alert('ログインに失敗しました: ' + error.message);
+            });
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        auth.signOut()
+            .then(() => {
+                console.log('ログアウト成功');
+                useFirestore = false;
+                // Restore from LocalStorage
+                rawStore = localStorage.getItem('ivyLeeData');
+                store = rawStore ? JSON.parse(rawStore) : null;
+                switchCategory(currentCategory, true);
+            })
+            .catch((error) => {
+                console.error('ログアウトエラー:', error);
+            });
+    });
+
+    // 認証状態の監視
+    auth.onAuthStateChanged((user) => {
+        currentUser = user;
+        if (user) {
+            // ログイン状態
+            googleLoginBtn.style.display = 'none';
+            userInfo.style.display = 'flex';
+            userEmail.textContent = user.email;
+            useFirestore = true;
+            loadDataFromFirestore();
+        } else {
+            // ログアウト状態
+            googleLoginBtn.style.display = 'block';
+            userInfo.style.display = 'none';
+            useFirestore = false;
+            // LocalStorage からデータ読み込み
+            switchCategory(currentCategory, true);
+        }
     });
 
     // ---- 3. Render UI (Weekly View with Scroll) ----

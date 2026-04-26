@@ -9,6 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1117">
     <link rel="apple-touch-icon" href="icon.svg">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
 </head>
 <body data-theme="sakura">
     <div class="app-layout">
@@ -26,6 +30,13 @@
                         </select>
                         <button id="show-routines-btn" class="secondary-btn">ルーティン設定</button>
                         <button id="show-history-btn" class="secondary-btn">完了履歴</button>
+                    </div>
+                    <div id="auth-container" class="auth-container">
+                        <button id="google-login-btn" class="secondary-btn" style="display:none;">Google でログイン</button>
+                        <div id="user-info" class="user-info" style="display:none;">
+                            <span id="user-email" class="user-email"></span>
+                            <button id="logout-btn" class="secondary-btn">ログアウト</button>
+                        </div>
                     </div>
                     <div class="category-toggle">
                         <button id="tab-work" class="tab-btn active" data-category="work">仕事</button>

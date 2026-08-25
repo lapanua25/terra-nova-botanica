@@ -6,10 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terra-Nova</title>
     <meta name="description" content="日々の生活を少し便利にする、自作アプリケーションのポータルサイト。">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="canonical" href="https://terra-nova-botanical.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Terra-Nova">
+    <meta property="og:title" content="Terra-Nova | 自作アプリケーション・ポータル">
+    <meta property="og:description" content="日々の生活を少し便利にする、自作アプリケーションのポータルサイト。">
+    <meta property="og:url" content="https://terra-nova-botanical.com/">
+    <meta name="twitter:card" content="summary">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="js/main.js" defer></script>
 </head>
 <body>
     <header class="navbar">
@@ -25,14 +34,15 @@
 
     <main>
         <section class="hero">
-            <h1 class="hero-title">Terra-Nova</h1>
-            <p class="hero-subtitle">生活と仕事を豊かにするための、自作ツールとアプリケーションのポータル。</p>
+            <p class="hero-eyebrow reveal">App Portfolio</p>
+            <h1 class="hero-title reveal" style="--reveal-delay: 0.1s;">Terra-Nova</h1>
+            <p class="hero-subtitle reveal" style="--reveal-delay: 0.2s;">生活と仕事を豊かにするための、自作ツールとアプリケーションのポータル。</p>
         </section>
 
         <section id="about" class="about-section">
             <div class="container container-narrow">
-                <h2 class="section-title">About Terra-Nova</h2>
-                <div class="about-content">
+                <h2 class="section-title reveal">About Terra-Nova</h2>
+                <div class="about-content reveal">
                     <h3>コンセプト</h3>
                     <p>Terra-Nova は、日常の業務改善や生活の可視化の手助けになればと考えて開発した、自作ツール・アプリケーション群です。シンプルで実用的なツールを目指しています。</p>
 
@@ -51,33 +61,66 @@
 
         <section id="apps" class="apps-section">
             <div class="container">
-                <h2 class="section-title">Applications</h2>
+                <h2 class="section-title reveal">Applications</h2>
                 <div class="card-grid">
                     <!-- App 1: Botanical Breed -->
-                    <a href="breeding-app/" class="app-card" target="_blank" rel="noopener noreferrer">
+                    <a href="breeding-app/" class="app-card reveal" style="--accent: #2d5a3e;" target="_blank" rel="noopener noreferrer">
                         <div class="card-icon" style="background-color: #2d5a3e;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                         </div>
                         <h3 class="card-title">Botanical Breed</h3>
                         <p class="card-desc">植物の個体情報を管理し、交配記録や形質スコア、成長過程の写真を一元管理できるアプリケーション。</p>
+                        <div class="card-footer">
+                            <span class="card-status is-live">Web版 公開中</span>
+                            <span class="card-arrow" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                            </span>
+                        </div>
                     </a>
 
                     <!-- App 2: Mandala Chart -->
-                    <a href="mandala/" class="app-card" target="_blank" rel="noopener noreferrer">
+                    <a href="mandala/" class="app-card reveal" style="--accent: #d4a574; --reveal-delay: 0.1s;" target="_blank" rel="noopener noreferrer">
                         <div class="card-icon" style="background-color: #d4a574;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="3"></circle><circle cx="7" cy="12" r="1"></circle><circle cx="17" cy="12" r="1"></circle><circle cx="12" cy="7" r="1"></circle><circle cx="12" cy="17" r="1"></circle></svg>
                         </div>
                         <h3 class="card-title">Mandala Chart</h3>
                         <p class="card-desc">9×9グリッドであなたの目標や夢を整理し、可視化・追跡できるマンダラ・チャート作成ツール。</p>
+                        <div class="card-footer">
+                            <span class="card-status is-live">Web版 公開中</span>
+                            <span class="card-arrow" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                            </span>
+                        </div>
                     </a>
 
                     <!-- App 3: SixDo -->
-                    <a href="https://apps.apple.com/jp/app/id6797027631" class="app-card" target="_blank" rel="noopener noreferrer">
+                    <a href="https://apps.apple.com/jp/app/id6797027631" class="app-card reveal" style="--accent: #C4705A; --reveal-delay: 0.2s;" target="_blank" rel="noopener noreferrer">
                         <div class="card-icon" style="background-color: #C4705A;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path></svg>
                         </div>
                         <h3 class="card-title">SixDo</h3>
-                        <p class="card-desc">今日やることを6つまでに絞る、アイビー・リー・メソッド専用のタスク管理アプリ。広告なし・データは端末内だけ。App Storeで配信中。</p>
+                        <p class="card-desc">今日やることを6つまでに絞る、アイビー・リー・メソッド専用のタスク管理アプリ。広告なし・データは端末内だけ。</p>
+                        <div class="card-footer">
+                            <span class="card-status is-live">App Store 配信中</span>
+                            <span class="card-arrow" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- App 4: Nib Journal -->
+                    <a href="nibjournal-support.html" class="app-card reveal" style="--accent: #6b4423; --reveal-delay: 0.3s;">
+                        <div class="card-icon" style="background-color: #6b4423;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                        </div>
+                        <h3 class="card-title">Nib Journal</h3>
+                        <p class="card-desc">紙のバレットジャーナルの思想をベースにした、毎日の気づきを記録する日記アプリ。デイリー記録とマンスリーの見える化。</p>
+                        <div class="card-footer">
+                            <span class="card-status">App Store 審査中</span>
+                            <span class="card-arrow" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                            </span>
+                        </div>
                     </a>
                 </div>
             </div>

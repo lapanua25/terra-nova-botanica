@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サポート | Botanical Breed</title>
+<style>
+  :root{
+    --bg:#f4efe7; --card:#faf7f2; --text:#2c2a26; --muted:#6f6a61;
+    --accent:#4d7a3a; --border:#e6ded1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+    line-height:1.85; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:32px 20px 64px;}
+  .brand{display:flex; align-items:center; gap:10px; margin-bottom:28px;}
+  .brand .leaf{width:34px; height:34px; border-radius:10px; background:#e4efdb;
+    display:flex; align-items:center; justify-content:center; font-size:18px;}
+  .brand b{font-size:16px;}
+  h1{font-size:24px; margin:0 0 6px;}
+  .lead{color:var(--muted); font-size:14px; margin-bottom:26px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:22px; margin-bottom:16px;}
+  h2{font-size:16px; margin:0 0 14px; color:var(--accent);}
+  .q{font-weight:700; font-size:15px; margin:14px 0 4px;}
+  .q:first-of-type{margin-top:0;}
+  p,li{font-size:15px;}
+  a{color:var(--accent);}
+  .btn{display:inline-block; background:var(--accent); color:#fff; text-decoration:none;
+    padding:13px 24px; border-radius:12px; font-weight:700; font-size:15px; margin-top:6px;}
+  footer{color:var(--muted); font-size:12px; text-align:center; margin-top:32px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="leaf">🌿</span><b>Botanical Breed</b></div>
+  <h1>サポート</h1>
+  <p class="lead">Botanical Breed は、アガベ・コーデックス・多肉植物の「一株ごと」を写真とデータで管理し、母株×父株の交配を記録できるアプリです。</p>
+
+  <div class="card">
+    <h2>よくある質問</h2>
+
+    <div class="q">Q. ログインの方法は？</div>
+    <p>メールアドレス、Google、Apple のいずれか、または「ゲストで試す」ですぐに始められます。</p>
+
+    <div class="q">Q. 登録した写真が表示されません。</div>
+    <p>通信環境をご確認のうえ、アプリを一度閉じて開き直してください。古いバージョンで登録した写真は、再度登録し直すと表示されます。</p>
+
+    <div class="q">Q. アカウントを削除したい。</div>
+    <p>「設定 → 画面下部のアカウントを削除」から、アカウントとすべてのデータを完全に削除できます（取り消しできません）。</p>
+
+    <div class="q">Q. データはどこに保存されますか？</div>
+    <p>バックエンドサービス（Supabase）上に安全に保存されます。詳しくは<a href="./botanical-breed-privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+  </div>
+
+  <div class="card">
+    <h2>お問い合わせ</h2>
+    <p>不具合のご報告・ご要望は、下記フォームよりお願いします。</p>
+    <a class="btn" href="https://forms.gle/e1CAi23s8oD2Uaru8" target="_blank" rel="noopener">お問い合わせフォームを開く</a>
+  </div>
+
+  <footer>© 2026 Botanical Breed</footer>
+</div>
+</body>
+</html>
